@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
     <meta charset="utf-8" />
@@ -14,13 +14,18 @@
 
 
 <div class="container-fluid mt-3" id="app">
-    <input type="text" class="form-control" v-model="criterioDeBusqueda"
-        placeholder="Ingresar un criterio de busqueda...">
+    <input type="text" class="form-control" v-model="criterioDeBusquedaNombre"
+        placeholder="Ingresar un nombre y/o apellido">
+    <input type="text" class="form-control mt-2" v-model="criterioDeBusquedaDni"
+        placeholder="Ingresar un dni">
+        <div class="alert alert-danger mt-2" role="alert" v-if="getCondicionCaracteresMinimos">
+            Tiene que ingresar al menos 3 caracteres en algún filtro
+        </div>
     <br>
     <div class="card-deck m-0">
         <div class="row">
             <div class="col" v-for="persona in personasFiltradas">
-                <div class="card mb-3">
+                <div class="card mb-2">
                     <div class="card-body">
                         <h5 class="card-title">{{getNombreCompleto(persona)}}</h5>
                         <p class="card-text">dni {{persona.dni}}</p>
@@ -39,8 +44,7 @@
     new Vue({
         el: '#app',
         data: {
-            criterioDeBusqueda: '',
-            //Aquí, en este array es donde tienen que agregar su información
+            criterioDeBusquedaNombre: '', criterioDeBusquedaDni: '', 
             personas: [
                 {
                     nombre: "Daniel",
@@ -335,10 +339,25 @@
         computed: {
             personasFiltradas() {
                 return this.personas.filter((persona) => {
-                    let registroCompleto = `${persona.nombre} ${persona.apellido} ${persona.dni} ${persona.correo}`
-                    return registroCompleto.toLowerCase().includes(this.criterioDeBusqueda.toLowerCase())
+                            let nombreCompleto = `${persona.nombre} ${persona.apellido}`
+                            let dni = `${persona.dni}`
+                            return nombreCompleto.toLowerCase().includes(this.criterioDeBusquedaNombre.toLowerCase()) &&
+                            dni.toLowerCase().includes(this.criterioDeBusquedaDni.toLowerCase())      
                 });
-            }
+            },
+            getCondicionCaracteresMinimos(){
+                return this.getMinCaracteresNombre || this.getMinCaracteresDni
+            },
+            getMinCaracteresNombre(){
+                return this.criterioDeBusquedaNombre.length !== 0 && this.criterioDeBusquedaNombre.length < 3
+            },
+            getMinCaracteresDni(){
+                return this.criterioDeBusquedaDni.length !== 0 && this.criterioDeBusquedaDni.length < 3
+            },
+            // Muestra los datos si se cunplen las condiciones
+            /*   getCondicionDeMuestra(){
+                return this.criterioDeBusquedaNombre.length >= 3 && this.criterioDeBusquedaDni.length >= 3
+            }   */
         },
         methods: {
             getNombreCompleto(persona) {
